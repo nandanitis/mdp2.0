@@ -4,6 +4,7 @@ emoji==2.2.0
 matplotlib==3.5.3
 nltk==3.8.1
 numpy==1.21.5
+urllib3==1.26.10
 pandas<=2.0.0
 Pillow<=9.5.0
 Pillow<=9.5.0
