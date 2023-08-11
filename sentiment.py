@@ -137,7 +137,7 @@ def vader(df) :
     analyzer = SentimentIntensityAnalyzer()
     def calculate_sentiment_score(review, rating):
         sentiment_score = analyzer.polarity_scores(review)["compound"]
-        sentiment_score = sentiment_score * (rating / 5) * 45 + 55
+        sentiment_score = sentiment_score * (int(rating) / 5) * 45 + 55
         return sentiment_score
 
 
@@ -334,25 +334,27 @@ def emojiAnalysis(df) :
   
 
     import matplotlib.pyplot as plt
-
-    # Assuming you have the variables: total_heart_count, total_thumbs_up_count, total_thumbs_down_count, total_crying_count
+    import plotly.graph_objects as go
 
     # Create the emoji labels and counts
     emojis = ['❤️', '👍', '👎', '😢']
     counts = [total_heart_count, total_thumbs_up_count, total_thumbs_down_count, total_crying_count]
 
-    # Set up the plot
-    plt.figure(figsize=(8, 6))
-    plt.bar(emojis, counts, color=['red', 'blue', 'green', 'purple'])
-    plt.xlabel('Emoji')
-    plt.ylabel('Count')
-    plt.title('Emoji Counts')
+   # Create a bar trace
+    trace = go.Bar(x=emojis, y=counts, marker_color=['red', 'blue', 'green', 'purple'])
 
-    # Add value labels on top of each bar
-    for i, count in enumerate(counts):
-        plt.text(i, count, str(count), ha='center', va='bottom')
+    # Create the layout
+    layout = go.Layout(
+        title='Emoji Counts',
+        xaxis=dict(title='Emoji'),
+        yaxis=dict(title='Count'),
+    )
 
-    st.pyplot()
+    # Create the figure
+    fig = go.Figure(data=[trace], layout=layout)
+
+    # Display the figure using Plotly chart in Streamlit
+    st.plotly_chart(fig)
 
 
 

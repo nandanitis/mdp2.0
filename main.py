@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from flipkartScrape import scrape
-from clean import clean, emoji
+from clean import cleanData, emoji
 from sentiment import categorical_variable_summary, vader, last18months, wordCloud, commonPhrases, emojiAnalysis, overalSentiment
 
 
@@ -19,74 +19,73 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 def render_home_page():
     st.write(
         '<style>div.block-container{padding-top:1rem;}</style>', unsafe_allow_html=True)
+    df = pd.DataFrame()
+    emojiDf=None
+    if 'firstLoop' not in st.session_state:
+        st.session_state.firstLoop = False
     st.title("Welcome to EmoTrackr📌")
+    
+    if 'count' not in st.session_state:
+        st.session_state.count = False
+
+    # if not st.session_state.count:
+    #         import time
+    #         st.session_state.count = True
+    #         left_co, cent_co,last_co = st.columns(3)
+    #         image=None
+    #         with cent_co:
+    #             image =st.image("pikka.gif")
+    #         def run_loop():
+    #             progress_bar = st.progress(0)  
+    #             message_placeholder = st.empty()
+    #             for i in range(1, 3):  
+    #                 time.sleep(0.5)  
+    #                 message_placeholder.empty()
+    #                 progress_bar.progress(i / 2)
+    #                 message_placeholder.write("")
+    #             message_placeholder.empty()
+    #             progress_bar.empty()
+    #         run_loop()
+    #         image.empty()
 
     # website = st.selectbox("Select a website", ["Flipkart", "Amazon"])
     url = st.text_input("Enter the URL")
 
-    # # Submit button
-    # if st.button("Run Sentiment"):
-    #     df = scrape(url)
-    #     df = clean(df)
-
-    # Specify the file name or file path relative to the current directory
-
-    
-    if 'firstLoop' not in st.session_state:
-        st.session_state.firstLoop = False
-
-    df = None
     if  not  st.session_state.firstLoop:
         st.session_state.firstLoop = True
-        import os
-        current_dir = os.getcwd()
-        file_name = "E__reviews.csv"
-        file_path = os.path.join(current_dir, file_name)
-        dfEmoji = None
-        # Read the file
-        file = open("Clean.csv", encoding="utf8")
-        df = pd.read_csv(file)
-        df = vader(df)
+
+    if 'emojiDf' not in st.session_state:
+            st.session_state.emojiDf = emojiDf
 
     if 'df' not in st.session_state:
         st.session_state.df = df
-    if 'count' not in st.session_state:
-        st.session_state.count = False
 
+    # Submit button
+    if st.button("Run Sentiment"):
+        df = scrape(url)
+        emojiDf = emoji(df)
+        df= cleanData(df)
+        df = vader(df)
+        st.session_state.df = df
+        st.session_state.emojiDf = emojiDf
 
+    
 
-    if not st.session_state.count:
-        import time
-        st.session_state.count = True
-        left_co, cent_co,last_co = st.columns(3)
-        image=None
-        with cent_co:
-            image =st.image("pikka.gif")
-        def run_loop():
-            progress_bar = st.progress(0)  
-            message_placeholder = st.empty()
-            for i in range(1, 12):  
-                time.sleep(0.5)  
-                message_placeholder.empty()
-                progress_bar.progress(i / 11)
-                message_placeholder.write("")
-            message_placeholder.empty()
-            progress_bar.empty()
-        run_loop()
-        image.empty()
 
     st.write('<style>div.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
-    option = st.radio("Select an option", ("Overview","SentimentScore", "Keywords", "WordCloud"), help="We have wide range of Analysers, Pick the Required one")
+    option = st.radio("Select an option", ("Overview","SentimentScore", "Keywords", "WordCloud","emoji"), help="We have wide range of Analysers, Pick the Required one")
 
-    if option == "Overview":
+    if option == "Overview" and st.session_state.df.empty != True :
         overalSentiment(st.session_state.df)
         categorical_variable_summary(st.session_state.df, 'Ratings')
-    elif option == "SentimentScore":
+    elif option == "SentimentScore" and st.session_state.df.empty != True:
         last18months(st.session_state.df)
-    elif option == "Keywords":
+    elif option == "Keywords" and st.session_state.df.empty != True :
         commonPhrases(st.session_state.df)
-    elif option == "WordCloud":
+    elif option == "WordCloud" and st.session_state.df.empty != True :
         wordCloud(st.session_state.df)
+    elif option == "emoji" and st.session_state.df.empty != True:
+        emojiAnalysis(st.session_state.emojiDf)
 
 
 def render_about_page():

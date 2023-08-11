@@ -30,12 +30,10 @@ def emoji(df) :
     return df1
 
 
-def clean(df) :
+def cleanData(df) :
     #Fiill Null values in Customer Names
     df['Customer Name'] = df['Customer Name'].fillna('User')
-
     # function to convert each value to number of months from current date
-
     def convert_to_months(date_str) :
         
         if 'day' in date_str:
@@ -54,10 +52,19 @@ def clean(df) :
     df["Date of Review"] = df["Date of Review"].apply(convert_to_months)
 
     # function to remove all the emojis
-
-    from cleantext import clean
+    emoji_pattern = re.compile("["
+                           u"\U0001F600-\U0001F64F"  # emoticons
+                           u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+                           u"\U0001F680-\U0001F6FF"  # transport & map symbols
+                           u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                           u"\U00002702-\U000027B0"  # Dingbats
+                           u"\U000024C2-\U0001F251" 
+                           "]+", flags=re.UNICODE)
+    
     def replace_emoji(sentence):
-        return clean(sentence, no_emoji=True)
+        return emoji_pattern.sub(r'', sentence)
 
     df['Reviews'] = df['Reviews'].apply(replace_emoji)
+
+    return df
 

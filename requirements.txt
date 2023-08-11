@@ -16,3 +16,5 @@ seaborn<=0.12.2
 streamlit<=1.22.0
 termcolor<=2.3.0
 wordcloud<=1.9.2
+
+pip install requests_html
